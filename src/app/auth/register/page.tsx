@@ -72,8 +72,9 @@ export default function RegisterPage() {
 
       router.push('/feed');
       router.refresh();
-    } catch (error: any) {
-      setError(error.message || 'Ocorreu um erro ao registrar. Por favor, tente novamente.');
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : 'Ocorreu um erro ao registrar. Por favor, tente novamente.';
+      setError(errorMessage);
       console.error('Registration error:', error);
     } finally {
       setLoading(false);

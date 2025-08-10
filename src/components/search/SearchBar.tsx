@@ -176,7 +176,7 @@ export default function SearchBar() {
             </div>
           ) : searchResults && (searchResults.users.length === 0 && searchResults.posts.length === 0) ? (
             <div className="p-4 text-center">
-              <p className="text-gray-400">Nenhum resultado encontrado para "{searchQuery}"</p>
+              <p className="text-gray-400">Nenhum resultado encontrado para &quot;{searchQuery}&quot;</p>
             </div>
           ) : (
             <div>
@@ -279,7 +279,7 @@ export default function SearchBar() {
                   }}
                   className="text-sm text-purple-400 hover:text-purple-300 transition-colors duration-150"
                 >
-                  Ver todos os resultados para "{searchQuery}"
+                  Ver todos os resultados para &quot;{searchQuery}&quot;
                 </button>
               </div>
             </div>

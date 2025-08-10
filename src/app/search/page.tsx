@@ -238,7 +238,7 @@ export default function SearchPage() {
   return (
     <div className="max-w-6xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
       <div className="mb-8">
-        <h1 className="text-2xl font-bold text-white mb-2">Resultados para "{query}"</h1>
+        <h1 className="text-2xl font-bold text-white mb-2">Resultados para &quot;{query}&quot;</h1>
         <p className="text-gray-400">{totalResults} {totalResults === 1 ? 'resultado encontrado' : 'resultados encontrados'}</p>
       </div>
 
