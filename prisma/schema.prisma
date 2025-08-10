@@ -1,0 +1,169 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String    @id @default(cuid())
+  name          String?
+  email         String?   @unique
+  emailVerified DateTime?
+  image         String?
+  coverImage    String?
+  bio           String?
+  username      String?   @unique
+  hashedPassword String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  posts         Post[]
+  comments      Comment[]
+  likes         Like[]
+  followers     Follow[]    @relation("Follower")
+  following     Follow[]    @relation("Following")
+  sentMessages  Message[]   @relation("Sender")
+  receivedMessages Message[] @relation("Receiver")
+  stories       Story[]
+  notifications Notification[] @relation("NotificationReceiver")
+  groups        GroupMember[]
+  marketItems   MarketItem[]
+}
+
+model Post {
+  id          String    @id @default(cuid())
+  caption      String?
+  mediaUrls    String[]
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+  userId       String
+  user         User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  comments     Comment[]
+  likes        Like[]
+  tags         Tag[]
+}
+
+model Comment {
+  id          String    @id @default(cuid())
+  text        String
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  userId      String
+  postId      String
+  
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  post        Post      @relation(fields: [postId], references: [id], onDelete: Cascade)
+}
+
+model Like {
+  id          String    @id @default(cuid())
+  createdAt   DateTime  @default(now())
+  userId      String
+  postId      String
+  
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  post        Post      @relation(fields: [postId], references: [id], onDelete: Cascade)
+  
+  @@unique([userId, postId])
+}
+
+model Follow {
+  id          String    @id @default(cuid())
+  createdAt   DateTime  @default(now())
+  followerId  String
+  followingId String
+  
+  follower    User      @relation("Follower", fields: [followerId], references: [id], onDelete: Cascade)
+  following   User      @relation("Following", fields: [followingId], references: [id], onDelete: Cascade)
+  
+  @@unique([followerId, followingId])
+}
+
+model Message {
+  id          String    @id @default(cuid())
+  content     String
+  mediaUrl    String?
+  createdAt   DateTime  @default(now())
+  senderId    String
+  receiverId  String
+  read        Boolean   @default(false)
+  
+  sender      User      @relation("Sender", fields: [senderId], references: [id], onDelete: Cascade)
+  receiver    User      @relation("Receiver", fields: [receiverId], references: [id], onDelete: Cascade)
+}
+
+model Story {
+  id          String    @id @default(cuid())
+  mediaUrl    String
+  createdAt   DateTime  @default(now())
+  expiresAt   DateTime
+  userId      String
+  
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Tag {
+  id          String    @id @default(cuid())
+  name        String    @unique
+  posts       Post[]
+}
+
+model Notification {
+  id          String    @id @default(cuid())
+  type        String    // like, comment, follow, message
+  content     String
+  read        Boolean   @default(false)
+  createdAt   DateTime  @default(now())
+  userId      String
+  
+  user        User      @relation("NotificationReceiver", fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Group {
+  id          String    @id @default(cuid())
+  name        String
+  description String?
+  imageUrl    String?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  
+  members     GroupMember[]
+}
+
+model GroupMember {
+  id          String    @id @default(cuid())
+  role        String    // admin, moderator, member
+  createdAt   DateTime  @default(now())
+  userId      String
+  groupId     String
+  
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  group       Group     @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  
+  @@unique([userId, groupId])
+}
+
+model MarketItem {
+  id          String    @id @default(cuid())
+  title       String
+  description String
+  price       Float
+  imageUrls   String[]
+  condition   String    // new, used
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  userId      String
+  
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
